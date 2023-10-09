@@ -1,0 +1,6 @@
+<!-- auctions/templates/auctions/add_comment.html -->
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Add Comment</button>
+</form>

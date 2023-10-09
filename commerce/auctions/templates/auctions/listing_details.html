@@ -1,0 +1,46 @@
+<!-- auctions/templates/auctions/listing_details.html -->
+{% extends "auctions/layout.html" %}
+{% block content %}
+  <h2>{{ listing.title }}</h2>
+  <p>{{ listing.description }}</p>
+  <p>Starting Bid: ${{ listing.starting_bid }}</p>
+  <p>Current Price: ${{ listing.current_bid }}</p>
+  <p>Seller: {{ listing.seller.username }}</p>
+  <p>Category: {{ listing.category }}</p>
+  <img src="{{ listing.image_url }}" alt="{{ listing.title }}" width="200">
+  
+  {% if request.user.is_authenticated %}
+    {% if request.user == listing.seller %}
+      {% if not listing.closed %}
+        <form method="post">
+          {% csrf_token %}
+          <button type="submit" name="close_auction" class="btn btn-danger">Close Auction</button>
+        </form>
+      {% endif %}
+    {% else %}
+      <form method="post">
+        {% csrf_token %}
+        {% if request.user in listing.watchlist.all %}
+          <button type="submit" name="watchlist" class="btn btn-warning">Remove from Watchlist</button>
+        {% else %}
+          <button type="submit" name="watchlist" class="btn btn-success">Add to Watchlist</button>
+        {% endif %}
+        <button type="submit" name="bid" class="btn btn-primary">Place Bid</button>
+        <input type="text" name="bid_amount" placeholder="Enter Bid Amount" required>
+      </form>
+    {% endif %}
+    
+    <h3>Comments</h3>
+    <ul>
+      {% for comment in listing.comments.all %}
+        <li>{{ comment.commenter.username }}: {{ comment.comment_text }}</li>
+      {% endfor %}
+    </ul>
+    
+    <form method="post">
+      {% csrf_token %}
+      <input type="text" name="comment_text" placeholder="Add a Comment" required>
+      <button type="submit" name="add_comment" class="btn btn-primary">Submit Comment</button>
+    </form>
+  {% endif %}
+{% endblock %}
